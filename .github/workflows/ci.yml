@@ -1,24 +1,37 @@
 name: ci
 
+# ✅ 给 GITHUB_TOKEN 明确写权限，否则默认可能是只读
+permissions:
+  contents: write  # ← 必需：允许写入仓库内容（push）
+
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: "1 1 * * *"
+    - cron: "1 1 * * *"  # 注意：UTC 时间，每天 01:01 UTC。在美东(UTC-4)是前一天的 21:01
 
 jobs:
   autogreen:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # ← 升级到 v4（v3 也可，但 v4 更新更全）
 
       - name: Auto green
+        env:
+          # ✅ 使用 x-access-token 形式，最稳妥的官方写法
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          USER_EMAIL: "139669368+AcideFluorhydrique@users.noreply.github.com"  # ← 改成你自己的 noreply 邮箱或公开邮箱
+          USER_NAME: "AcideFluorhydrique"  # ← 改成你自己的 GitHub 用户名
         run: |
-          git config --local user.email "139669368+AcideFluorhydrique@users.noreply.github.com"
-          git config --local user.name "AcideFluorhydrique"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git config --local user.email "${USER_EMAIL}"   # ← 改成你自己的
+          git config --local user.name "${USER_NAME}"     # ← 改成你自己的
+
+          # ✅ 用 x-access-token 重新配置 origin（更通用）
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${REPO}.git
+
           git pull --rebase
-          git commit --allow-empty -m "Auto green commit"
+          git commit --allow-empty -m "Auto green commit"  # ← 提交信息可自定义
           git push
