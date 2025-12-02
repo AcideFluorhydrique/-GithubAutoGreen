@@ -19,8 +19,8 @@ jobs:
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          USER_EMAIL: "geo.wang+ac@nyu.edu"
-          USER_NAME: "GeoYWang"
+          USER_EMAIL: "139669368+AcideFluorhydrique@users.noreply.github.com"
+          USER_NAME: "AcideFluorhydrique"
         run: |
           git config --local user.email "${USER_EMAIL}"
           git config --local user.name "${USER_NAME}"
